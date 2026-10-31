@@ -1,39 +1,90 @@
 # System Design Simulator
 
-Simulador visual de arquiteturas de software. Monte um fluxo com drag-and-drop,
-ajuste a carga e acompanhe capacidade, latência, erros e saúde dos componentes.
+Aprenda arquitetura de sistemas distribuídos montando e testando designs no
+navegador. Conecte componentes, aumente a carga e observe latência, erros,
+gargalos e escalabilidade — sem provisionar infraestrutura real.
+
+![Simulador com uma arquitetura de serviços, cache, fila e banco de dados em execução](public/og-image.png)
+
+[Contribuir](CONTRIBUTING.md) · [Segurança](SECURITY.md) · [Licença MIT](LICENSE)
 
 ## Recursos
 
-- Canvas baseado em React Flow com client, CDN, load balancer, API gateway,
-  service, cache, filas, workers, SQL, NoSQL e storage.
-- Simulação determinística com mix global de leituras e escritas.
-- Réplicas para service, worker, cache e bancos; queda gradual sob sobrecarga e
-  recuperação por reinício de atraso fixo. Autoscaling opcional por componente
-  (piso, teto e utilização-alvo), independente do ciclo de vida da réplica.
-- SQL escala leitura com réplicas, mas mantém uma primária de escrita. NoSQL
-  escala escrita por shards e leitura por shards e réplicas.
-- Cada design tem identidade própria (nome opcional, salvar/carregar/renomear/
-  excluir, aviso de alterações não salvas), exportação/importação JSON e
-  avaliação por IA.
-- Tema claro/escuro, preferência do navegador.
+- **Canvas interativo:** cliente, CDN, load balancer, API gateway, serviços,
+  cache, filas, workers, bancos SQL/NoSQL e object storage.
+- **Carga configurável:** requisições por segundo e proporção de leituras e
+  escritas, com métricas de sucesso, latência e erros.
+- **Escalabilidade e falhas:** réplicas, shards em NoSQL, degradação sob
+  sobrecarga, reinício e autoscaling opcional nos componentes compatíveis.
+- **Tecnologias e parâmetros:** presets e ajustes de capacidade, latência e
+  outras propriedades por componente.
+- **Designs persistidos:** salvar, carregar, renomear, excluir e importar ou
+  exportar JSON, com proteção contra alterações não salvas.
+- **Avaliação por IA opcional:** feedback sobre arquitetura, requisitos e
+  métricas usando uma chave própria do OpenRouter.
+- **Temas claro e escuro**, interface em português e execução client-side.
 
-## Desenvolvimento
+## Executar localmente
 
-Requer Node.js e npm.
+Recomendado: **Node.js 24 LTS** e npm.
 
 ```bash
-npm install
+git clone https://github.com/holocaster/system-design-simulator.git
+cd system-design-simulator
+npm ci
 npm run dev
 ```
 
-Abra o endereço mostrado pelo Vite, normalmente `http://localhost:5173`.
+Abra o endereço informado pelo Vite, normalmente `http://localhost:5173`.
+Não é necessário configurar uma API para usar a simulação.
+
+### Primeiro design
+
+1. Arraste os componentes da paleta para o canvas.
+2. Conecte as saídas e entradas para montar o fluxo de tráfego.
+3. Selecione os componentes e ajuste suas propriedades.
+4. Configure RPS e percentual de escritas e inicie a simulação.
+5. Observe os gargalos, altere a arquitetura e compare os resultados.
+
+Use salvar/carregar para manter designs neste navegador ou exporte um JSON
+para guardar uma cópia fora dele.
 
 ## Avaliação por IA
 
-Em **Configurar API**, informe uma chave e um model ID do OpenRouter. Ambos ficam
-somente no localStorage do navegador e a avaliação recebe o design, as métricas
-e a carga atual da simulação.
+Em **Configurar API**, informe sua chave do OpenRouter e escolha um modelo.
+A chave e a preferência de modelo ficam no `localStorage` do navegador.
+
+Ao solicitar uma avaliação, o navegador envia a arquitetura, o enunciado,
+a carga e as métricas ao OpenRouter; a chave é enviada para autenticar essa
+requisição. O conteúdo é processado conforme o provedor/modelo escolhido,
+e o uso pode gerar custos na sua conta.
+
+**Não inclua segredos ou dados de produção nos designs ou enunciados.**
+O `localStorage` não é um cofre de credenciais. Consulte a
+[política de segurança](SECURITY.md) para mais cuidados.
+
+## Limitações da simulação
+
+Esta é uma ferramenta educacional, não um benchmark nem uma previsão de
+capacidade de produção. Os resultados seguem um modelo determinístico e
+simplificado; não executam os serviços ou bancos representados no canvas.
+Valide decisões reais com medições e testes no ambiente de destino.
+
+## Desenvolvimento e testes
+
+Stack: React 19, TypeScript, Vite, React Flow e Zustand. A engine fica em
+`src/engine/`, separada da interface e do estado da aplicação.
+
+```bash
+npm run build
+npm run lint
+npx vitest run
+npm run e2e
+```
+
+O build inclui a verificação de tipos. Os testes unitários usam Vitest;
+os testes de interface usam Playwright. Para preparar o Chromium e conferir
+os requisitos dos testes, veja [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Publicação e deploy
 
@@ -51,11 +102,14 @@ configuração de produção.
 Para não expor seu e-mail no novo histórico Git, configure um nome público e
 o e-mail `noreply` fornecido pelo GitHub antes do primeiro commit.
 
-## Verificação
+## Contribuir e reportar problemas
 
-```bash
-npm run build
-npm run lint
-npx vitest run
-npm run e2e
-```
+Encontrou um bug ou tem uma sugestão? Confira o
+[guia de contribuição](CONTRIBUTING.md) antes de abrir uma issue ou PR.
+Para vulnerabilidades, siga [SECURITY.md](SECURITY.md), sem divulgar detalhes
+sensíveis em uma issue pública.
+
+## Licença
+
+Distribuído sob a [licença MIT](LICENSE). Dependências e assets de terceiros
+continuam sujeitos às respectivas licenças.
