@@ -1,0 +1,90 @@
+/*
+ * Tokens da direção visual "Estúdio" (AD-023).
+ * Única fonte de cor, tipografia, espaçamento, raio e sombra do app.
+ * Tema escuro em bloco próprio no fim do arquivo (AD-055); tipografia,
+ * espaçamento, raio e a estrutura das sombras não mudam entre temas.
+ */
+
+:root {
+  /* Cor — superfícies */
+  --color-app-bg: #f6f5fb;
+  --color-canvas: #f1eff9;
+  --color-panel: #ffffff;
+  --color-line: #e2dff0;
+
+  /* Cor — texto */
+  --color-text: #221d34;
+  --color-text-secondary: #6f6889;
+  --color-on-accent: #ffffff;
+
+  /* Cor — acento */
+  --color-accent: #5a49d6;
+
+  /* Cor — semântica de saúde */
+  --color-health-ok: #12886a;
+  --color-health-warn: #c07a10;
+  --color-health-bad: #d1435b;
+  --color-health-down: #8a8492;
+
+  /* Tipografia */
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --font-size-2xs: 0.6875rem;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.8125rem;
+  --font-size-md: 0.875rem;
+  --font-size-lg: 1rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  /* Espaçamento */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* Raio */
+  --radius-sm: 7px;
+  --radius-md: 11px;
+  --radius-pill: 999px;
+
+  /* Sombra */
+  --shadow-sm: 0 2px 10px rgb(34 29 52 / 9%);
+  --shadow-lg: 0 6px 24px rgb(34 29 52 / 10%);
+}
+
+:root[data-theme='dark'] {
+  /* Cor — superfícies */
+  --color-app-bg: #17141f;
+  --color-canvas: #1e1a2b;
+  --color-panel: #241f35;
+  --color-line: #3a3350;
+
+  /* Cor — texto */
+  --color-text: #ede9f7;
+  --color-text-secondary: #a29bc2;
+  --color-on-accent: #ffffff;
+
+  /* Cor — acento */
+  --color-accent: #8f7ff0;
+
+  /* Cor — semântica de saúde */
+  --color-health-ok: #34c38f;
+  --color-health-warn: #e2a53d;
+  --color-health-bad: #f16a82;
+  --color-health-down: #726c8a;
+
+  /* Sombra */
+  --shadow-sm: 0 2px 10px rgb(0 0 0 / 35%);
+  --shadow-lg: 0 6px 24px rgb(0 0 0 / 45%);
+}

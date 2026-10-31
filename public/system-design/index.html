@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <title>O que é System Design? Guia Prático + Simulador</title>
+    <meta
+      name="description"
+      content="Entenda os fundamentos de System Design: requisitos, escalabilidade, disponibilidade, latência e os componentes de uma arquitetura distribuída. Pratique ao vivo no simulador gratuito."
+    />
+    <link rel="canonical" href="https://example.com/system-design/" />
+    <link rel="stylesheet" href="/content.css" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://example.com/system-design/" />
+    <meta property="og:title" content="O que é System Design? Guia Prático + Simulador" />
+    <meta
+      property="og:description"
+      content="Entenda os fundamentos de System Design: requisitos, escalabilidade, disponibilidade, latência e os componentes de uma arquitetura distribuída."
+    />
+    <meta property="og:image" content="https://example.com/og-image.png" />
+    <meta property="og:locale" content="pt_BR" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="O que é System Design? Guia Prático + Simulador" />
+    <meta
+      name="twitter:description"
+      content="Entenda os fundamentos de System Design e pratique ao vivo no simulador gratuito, 100% no navegador."
+    />
+    <meta name="twitter:image" content="https://example.com/og-image.png" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "O que é System Design?",
+        "description": "Entenda os fundamentos de System Design: requisitos, escalabilidade, disponibilidade, latência e os componentes de uma arquitetura distribuída.",
+        "inLanguage": "pt-BR",
+        "datePublished": "2026-08-14",
+        "dateModified": "2026-08-14",
+        "mainEntityOfPage": "https://example.com/system-design/"
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Início",
+            "item": "https://example.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "System Design",
+            "item": "https://example.com/system-design/"
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <div class="content-shell">
+      <nav class="content-breadcrumbs" aria-label="breadcrumb">
+        <a href="/">Início</a> &gt; System Design
+      </nav>
+
+      <main>
+        <article>
+          <p class="content-kicker">Guia</p>
+          <h1>O que é System Design?</h1>
+          <p class="content-lede">
+            System Design é o processo de desenhar a arquitetura de um sistema
+            de software para atender requisitos de escala, disponibilidade e
+            desempenho — decidindo como componentes como servidores, bancos de
+            dados, caches e filas se conectam e se comportam sob carga real.
+          </p>
+
+          <h2>Requisitos funcionais e não funcionais</h2>
+          <p>
+            Todo desenho de arquitetura parte de duas perguntas diferentes.
+            Requisitos <strong>funcionais</strong> definem o que o sistema
+            precisa fazer (ex.: "criar um pedido", "autenticar um usuário").
+            Requisitos <strong>não funcionais</strong> definem como ele precisa
+            se comportar sob pressão: quantas requisições por segundo, qual
+            latência máxima aceitável, qual taxa de erro tolerável, e o que
+            acontece quando um componente falha.
+          </p>
+
+          <h2>Os quatro pilares</h2>
+          <ul>
+            <li>
+              <strong>Escalabilidade</strong> — a capacidade de atender mais
+              carga adicionando réplicas (horizontal) ou aumentando a
+              capacidade de uma instância (vertical).
+            </li>
+            <li>
+              <strong>Disponibilidade</strong> — o sistema continuar
+              respondendo mesmo quando parte dele falha, evitando pontos
+              únicos de falha (single point of failure).
+            </li>
+            <li>
+              <strong>Latência</strong> — quanto tempo uma requisição leva
+              para ser respondida.
+            </li>
+            <li>
+              <strong>Throughput</strong> — quantas requisições o sistema
+              processa por unidade de tempo.
+            </li>
+          </ul>
+          <p>
+            Latência e throughput costumam entrar em conflito com custo e
+            complexidade — não existe arquitetura "perfeita", só arquiteturas
+            com trade-offs diferentes para requisitos diferentes.
+          </p>
+
+          <h2>Componentes comuns de uma arquitetura</h2>
+          <p>
+            Na prática, a maioria dos sistemas distribuídos é composta por uma
+            combinação destes blocos:
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Componente</th>
+                <th>Papel</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Load Balancer</td><td>Distribui requisições entre múltiplas réplicas de um serviço.</td></tr>
+              <tr><td>API Gateway</td><td>Ponto de entrada único para roteamento, autenticação e agregação.</td></tr>
+              <tr><td>CDN</td><td>Serve conteúdo estático e cacheável perto do usuário.</td></tr>
+              <tr><td>Cache</td><td>Absorve leituras repetidas e reduz pressão no banco de dados.</td></tr>
+              <tr><td>Fila / Worker</td><td>Processa tarefas de forma assíncrona, desacoplando produtor e consumidor.</td></tr>
+              <tr><td>Banco SQL</td><td>Escala leitura por réplicas; escrita passa por uma primária.</td></tr>
+              <tr><td>Banco NoSQL</td><td>Escala leitura e escrita distribuindo dados em shards.</td></tr>
+            </tbody>
+          </table>
+          <p>
+            Veja em detalhe como o <a href="/componentes/cache/">Cache</a>
+            funciona e como ele é modelado em uma simulação real.
+          </p>
+
+          <h2>Como praticar</h2>
+          <p>
+            A forma mais rápida de internalizar esses conceitos não é
+            decorá-los — é ver o efeito de cada decisão. O que acontece com a
+            latência quando você tira um cache do caminho? O que acontece com
+            a taxa de erro quando uma réplica cai sob carga sustentada?
+          </p>
+
+          <div class="content-cta">
+            <p>
+              O Simulador de System Design deixa você montar esses
+              componentes por drag-and-drop, gerar carga real e observar
+              latência, erros e saúde de cada peça ao vivo — direto no
+              navegador, sem instalar nada.
+            </p>
+            <a class="button" href="/">Abrir o simulador</a>
+          </div>
+
+          <nav class="content-related" aria-label="Continue aprendendo">
+            <h2>Continue aprendendo</h2>
+            <ul>
+              <li><a href="/componentes/cache/">Cache em System Design: quando usar e como funciona</a></li>
+            </ul>
+          </nav>
+        </article>
+      </main>
+    </div>
+  </body>
+</html>

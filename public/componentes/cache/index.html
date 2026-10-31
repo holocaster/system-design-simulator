@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <title>Cache em System Design: Quando Usar + Simulação</title>
+    <meta
+      name="description"
+      content="Entenda como cache reduz latência e protege o banco de dados: cache-aside, TTL, invalidação, hit ratio e quando não usar. Teste ao vivo no simulador gratuito."
+    />
+    <link rel="canonical" href="https://example.com/componentes/cache/" />
+    <link rel="stylesheet" href="/content.css" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://example.com/componentes/cache/" />
+    <meta property="og:title" content="Cache em System Design: Quando Usar + Simulação" />
+    <meta
+      property="og:description"
+      content="Entenda como cache reduz latência e protege o banco de dados: cache-aside, TTL, invalidação, hit ratio e quando não usar."
+    />
+    <meta property="og:image" content="https://example.com/og-image.png" />
+    <meta property="og:locale" content="pt_BR" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Cache em System Design: Quando Usar + Simulação" />
+    <meta
+      name="twitter:description"
+      content="Entenda como cache reduz latência e protege o banco de dados. Teste ao vivo no simulador gratuito."
+    />
+    <meta name="twitter:image" content="https://example.com/og-image.png" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "Cache em System Design: quando usar e como funciona",
+        "description": "Entenda como cache reduz latência e protege o banco de dados: cache-aside, TTL, invalidação, hit ratio e quando não usar.",
+        "inLanguage": "pt-BR",
+        "datePublished": "2026-08-14",
+        "dateModified": "2026-08-14",
+        "mainEntityOfPage": "https://example.com/componentes/cache/"
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Início",
+            "item": "https://example.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "System Design",
+            "item": "https://example.com/system-design/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Cache",
+            "item": "https://example.com/componentes/cache/"
+          }
+        ]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Quando devo usar cache?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Quando o mesmo dado é lido com muito mais frequência do que é escrito, e uma pequena janela de dado desatualizado é aceitável. Cache reduz latência de leitura e tira carga do banco de dados."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Cache é obrigatório em toda arquitetura?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Não. Para cargas majoritariamente de escrita, ou onde o dado precisa estar sempre atualizado, cache adiciona complexidade (invalidação, staleness) sem benefício claro."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Cache absorve escritas?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Não. Cache só absorve leituras. Toda escrita segue direto para o banco de dados, então adicionar cache não ajuda a escalar um sistema com carga de escrita pesada."
+            }
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <div class="content-shell">
+      <nav class="content-breadcrumbs" aria-label="breadcrumb">
+        <a href="/">Início</a> &gt; <a href="/system-design/">System Design</a> &gt; Cache
+      </nav>
+
+      <main>
+        <article>
+          <p class="content-kicker">Componente</p>
+          <h1>Cache em System Design</h1>
+          <p class="content-lede">
+            Cache é uma camada de armazenamento rápido que guarda respostas já
+            calculadas para evitar recalcular ou reconsultar o banco de dados
+            a cada leitura repetida — trocando um pouco de consistência por
+            latência muito menor.
+          </p>
+
+          <h2>Por que usar cache</h2>
+          <p>
+            Bancos de dados são normalmente o recurso mais caro e mais lento
+            de uma arquitetura. Se um mesmo dado é lido centenas de vezes para
+            cada vez que muda, cachear esse dado evita repetir o trabalho —
+            reduz latência para quem lê e reduz a carga que chega ao banco.
+          </p>
+
+          <h2>Cache-aside</h2>
+          <p>
+            O padrão mais comum: a aplicação verifica o cache primeiro. Se o
+            dado está lá (<em>hit</em>), retorna direto. Se não está
+            (<em>miss</em>), busca no banco, guarda no cache e retorna. É
+            simples e só cacheia o que realmente é lido.
+          </p>
+
+          <h2>TTL e invalidação</h2>
+          <p>
+            Todo dado em cache precisa expirar (TTL — time to live) ou ser
+            invalidado explicitamente quando o dado original muda.
+            Invalidação mal feita é a fonte mais comum de bugs relacionados a
+            cache: dado desatualizado sendo servido como se fosse atual.
+          </p>
+
+          <h2>Quando não usar cache</h2>
+          <ul>
+            <li>Quando a carga é majoritariamente de escrita — cache não acelera escrita.</li>
+            <li>Quando o dado muda com muita frequência — a taxa de acerto (hit ratio) cai e o cache vira só uma camada extra de latência.</li>
+            <li>Quando a aplicação não tolera nenhuma janela de inconsistência.</li>
+          </ul>
+
+          <h2>Como o simulador modela cache</h2>
+          <p>
+            No <a href="/">Simulador de System Design</a>, o componente de
+            cache segue o mesmo comportamento descrito acima, com parâmetros
+            que você pode ajustar:
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Parâmetro</th>
+                <th>Padrão</th>
+                <th>Efeito</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Hit ratio</td>
+                <td>80%</td>
+                <td>Percentual de leituras respondidas pelo cache; o restante segue para o banco.</td>
+              </tr>
+              <tr>
+                <td>Capacidade por réplica</td>
+                <td>50.000 req/s</td>
+                <td>Limite de requisições por réplica antes de degradar.</td>
+              </tr>
+              <tr>
+                <td>Réplicas</td>
+                <td>1 a 20</td>
+                <td>Escala horizontal do cache sob carga.</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            Como no mundo real, o cache no simulador só absorve
+            <strong>leituras</strong> — o tráfego de escrita sempre segue até
+            o banco de dados, mesmo com cache no caminho.
+          </p>
+
+          <div class="content-cta">
+            <p>
+              Monte uma API com e sem cache na frente do banco, gere a mesma
+              carga nos dois cenários e compare latência e taxa de erro lado a
+              lado.
+            </p>
+            <a class="button" href="/">Abrir o simulador</a>
+          </div>
+
+          <nav class="content-related" aria-label="Continue aprendendo">
+            <h2>Continue aprendendo</h2>
+            <ul>
+              <li><a href="/system-design/">O que é System Design? Guia prático</a></li>
+            </ul>
+          </nav>
+        </article>
+      </main>
+    </div>
+  </body>
+</html>

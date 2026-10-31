@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <title>Simulador de System Design — Aprenda Arquitetura de Sistemas</title>
+    <meta
+      name="description"
+      content="Simule arquiteturas distribuídas, gere carga real e veja latência, erros e escalabilidade ao vivo. Ferramenta educacional gratuita, 100% no navegador."
+    />
+    <link rel="canonical" href="https://example.com/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://example.com/" />
+    <meta property="og:title" content="Simulador de System Design — Aprenda Arquitetura de Sistemas" />
+    <meta
+      property="og:description"
+      content="Simule arquiteturas distribuídas, gere carga real e veja latência, erros e escalabilidade ao vivo. Ferramenta educacional gratuita, 100% no navegador."
+    />
+    <meta property="og:image" content="https://example.com/og-image.png" />
+    <meta property="og:locale" content="pt_BR" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Simulador de System Design — Aprenda Arquitetura de Sistemas" />
+    <meta
+      name="twitter:description"
+      content="Simule arquiteturas distribuídas, gere carga real e veja latência, erros e escalabilidade ao vivo. Ferramenta educacional gratuita, 100% no navegador."
+    />
+    <meta name="twitter:image" content="https://example.com/og-image.png" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Simulador de System Design",
+        "url": "https://example.com/",
+        "description": "Simulador educacional e gratuito de arquiteturas de sistemas distribuídos: monte componentes, gere carga real e observe latência, erros e escalabilidade ao vivo.",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Any",
+        "inLanguage": "pt-BR",
+        "dateModified": "2026-08-14",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "BRL"
+        }
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Como montar e simular um design de arquitetura?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Arraste um componente da paleta à esquerda para o canvas. Conecte componentes clicando e arrastando de um ponto de conexão a outro. Ajuste a carga (RPS) e o percentual de escritas na barra de controle, depois clique em \"Iniciar\" para rodar a simulação."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "O que significam as cores de saúde dos componentes?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Cada componente mostra um estado de saúde: Saudável, Degradado, Sobrecarregado ou Inativo, calculado a partir da carga simulada em tempo real."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Como funciona a avaliação da arquitetura por IA?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Em \"Configurar API\", informe uma chave e um modelo da OpenRouter para receber uma avaliação da sua arquitetura. A chave fica só no armazenamento local deste navegador."
+            }
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <main>
+        <h1>Simulador de System Design</h1>
+        <p>
+          Simulador visual e gratuito de arquiteturas de sistemas distribuídos,
+          100% no navegador. Monte componentes (client, CDN, load balancer, API
+          gateway, service, cache, filas, workers, SQL, NoSQL, storage) por
+          drag-and-drop, gere carga real e observe latência, erros, saúde e
+          escalabilidade ao vivo.
+        </p>
+        <h2>Como montar e simular um design</h2>
+        <p>
+          Arraste um componente da paleta à esquerda para o canvas. Conecte
+          componentes clicando e arrastando de um ponto de conexão a outro.
+          Ajuste a carga (RPS) e o percentual de escritas na barra de controle,
+          depois clique em "Iniciar" para rodar a simulação.
+        </p>
+        <h2>Cores de saúde</h2>
+        <p>Saudável, Degradado, Sobrecarregado e Inativo.</p>
+        <h2>Avaliação por IA</h2>
+        <p>
+          Em "Configurar API", informe uma chave e um modelo da OpenRouter para
+          receber uma avaliação da sua arquitetura. A chave fica só no
+          armazenamento local deste navegador.
+        </p>
+        <p>Este site requer JavaScript para a simulação interativa.</p>
+      </main>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

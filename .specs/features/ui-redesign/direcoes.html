@@ -1,0 +1,718 @@
+<title>Três direções visuais — System Design Simulator</title>
+<style>
+  :root {
+    --page-bg: #f7f7f6;
+    --page-surface: #ffffff;
+    --page-line: #e0e0dd;
+    --page-text: #1b1c1a;
+    --page-dim: #6a6d67;
+    --page-accent: #3f6212;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page-bg: #14151a;
+      --page-surface: #1c1e24;
+      --page-line: #2e313a;
+      --page-text: #e8e9ec;
+      --page-dim: #9599a3;
+      --page-accent: #a3e635;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page-bg: #14151a;
+    --page-surface: #1c1e24;
+    --page-line: #2e313a;
+    --page-text: #e8e9ec;
+    --page-dim: #9599a3;
+    --page-accent: #a3e635;
+  }
+  :root[data-theme="light"] {
+    --page-bg: #f7f7f6;
+    --page-surface: #ffffff;
+    --page-line: #e0e0dd;
+    --page-text: #1b1c1a;
+    --page-dim: #6a6d67;
+    --page-accent: #3f6212;
+  }
+
+  body {
+    margin: 0;
+    background: var(--page-bg);
+    color: var(--page-text);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.55;
+  }
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+  .page-head { display: flex; flex-direction: column; gap: 10px; max-width: 62ch; }
+  .page-head h1 {
+    margin: 0;
+    font-size: clamp(1.7rem, 1.2rem + 1.6vw, 2.4rem);
+    font-weight: 640;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .page-head p { margin: 0; color: var(--page-dim); }
+  .kicker {
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--page-accent);
+    font-weight: 640;
+  }
+
+  .dir { display: flex; flex-direction: column; gap: 18px; }
+  .dir-head { display: flex; flex-direction: column; gap: 6px; max-width: 68ch; }
+  .dir-head h2 {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 640;
+    letter-spacing: -0.015em;
+  }
+  .dir-head h2 span { color: var(--page-dim); font-weight: 500; }
+  .dir-head p { margin: 0; color: var(--page-dim); }
+
+  .tokens { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .tokens li {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 10px 4px 5px;
+    border: 1px solid var(--page-line);
+    border-radius: 999px;
+    background: var(--page-surface);
+    font-size: 0.72rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--page-dim);
+  }
+  .tokens i {
+    width: 15px; height: 15px; border-radius: 50%;
+    border: 1px solid rgb(0 0 0 / 18%);
+  }
+
+  .frame {
+    overflow-x: auto;
+    border: 1px solid var(--page-line);
+    border-radius: 10px;
+    background: var(--page-surface);
+  }
+
+  .notes { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; max-width: 76ch; }
+  .notes li { padding-left: 18px; position: relative; color: var(--page-dim); font-size: 0.9rem; }
+  .notes li::before {
+    content: "";
+    position: absolute; left: 3px; top: 0.62em;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--page-accent);
+  }
+  .notes b { color: var(--page-text); font-weight: 600; }
+
+  /* ---------- mockup shell (shared markup, per-direction tokens) ---------- */
+  .mk {
+    display: grid;
+    grid-template-columns: 176px 1fr 236px;
+    min-width: 1160px;
+    height: 520px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--ui);
+    font-size: 12px;
+  }
+  .mk-side, .mk-panel {
+    background: var(--panel);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    padding: 14px;
+    overflow: hidden;
+  }
+  .mk-side { border-right: 1px solid var(--line); }
+  .mk-panel { border-left: 1px solid var(--line); }
+  .mk-title {
+    font-size: 10px;
+    letter-spacing: var(--track);
+    text-transform: var(--caps);
+    color: var(--dim);
+    font-weight: 650;
+    margin: 0;
+  }
+  .mk-main { position: relative; background: var(--canvas); overflow: hidden; }
+
+  .mk-palette { display: flex; flex-direction: column; gap: var(--gap); }
+  .mk-pal-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: var(--pad-y) 9px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--chip);
+    color: var(--text);
+    cursor: grab;
+  }
+  .mk-sigla {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 30px; padding: 2px 5px;
+    border-radius: var(--radius-sm);
+    background: var(--sigla-bg);
+    color: var(--sigla-fg);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .mk-btn {
+    padding: 7px 10px;
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    background: var(--btn-bg);
+    color: var(--btn-fg);
+    font: inherit;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+  }
+  .mk-btn-primary {
+    background: var(--accent);
+    color: var(--on-accent);
+    border-color: var(--accent);
+  }
+  .mk-spacer { flex: 1; }
+
+  /* control bar */
+  .mk-bar {
+    position: absolute; top: 12px; left: 16px; right: 16px; z-index: 5;
+    display: flex; align-items: center; gap: 16px;
+    padding: var(--bar-pad);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--bar-bg);
+    box-shadow: var(--shadow);
+  }
+  .mk-field { display: flex; flex-direction: column; gap: 3px; }
+  .mk-label {
+    font-size: 9.5px;
+    letter-spacing: var(--track);
+    text-transform: var(--caps);
+    color: var(--dim);
+    font-weight: 620;
+  }
+  .mk-slider {
+    width: 128px; height: 4px; border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent) 0 46%, var(--line) 46% 100%);
+    position: relative;
+  }
+  .mk-slider::after {
+    content: ""; position: absolute; left: 46%; top: 50%;
+    width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px;
+    border-radius: 50%; background: var(--accent);
+    box-shadow: 0 0 0 2px var(--bar-bg);
+  }
+  .mk-input {
+    padding: 4px 7px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--input-bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    min-width: 58px;
+  }
+  .mk-stats { display: flex; gap: var(--stat-gap); margin-left: auto; }
+  .mk-stat { display: flex; flex-direction: column; gap: 1px; min-width: 62px; }
+  .mk-stat b {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: var(--stat-size);
+    font-weight: var(--stat-weight);
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+
+  /* canvas + nodes */
+  .mk-canvas { position: absolute; inset: 0; padding: 74px 0 0 20px; }
+  .mk-stage { position: relative; width: 800px; height: 385px; }
+  .mk-edges { position: absolute; inset: 0; overflow: visible; }
+  .mk-edges path { fill: none; stroke: var(--edge); stroke-width: 1.6; }
+  .mk-edges .hot { stroke: var(--bad); stroke-width: 2.2; }
+
+  .mk-node {
+    position: absolute;
+    width: 132px; height: 96px;
+    box-sizing: border-box;
+    display: flex; flex-direction: column; gap: var(--node-gap);
+    padding: var(--node-pad);
+    border: var(--node-border);
+    border-radius: var(--radius);
+    background: var(--node-bg);
+    box-shadow: var(--node-shadow);
+    overflow: hidden;
+  }
+  .mk-node-head { display: flex; align-items: center; gap: 5px; }
+  .mk-node-name { font-weight: 620; font-size: 11.5px; letter-spacing: -0.01em; }
+  .mk-badge {
+    margin-left: auto;
+    padding: 1px 5px;
+    border-radius: var(--radius-sm);
+    background: var(--badge-bg);
+    color: var(--badge-fg);
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+  }
+  .mk-tech {
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 0.02em;
+  }
+  .mk-metrics {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1px 8px;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 9.5px;
+    color: var(--dim);
+  }
+  .mk-bar-track {
+    height: var(--track-h);
+    border-radius: var(--track-h);
+    background: var(--track-bg);
+    overflow: hidden;
+  }
+  .mk-bar-fill { height: 100%; border-radius: inherit; }
+
+  .mk-prop { display: flex; flex-direction: column; gap: 3px; }
+  .mk-prop input, .mk-prop .mk-select {
+    padding: 5px 7px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--input-bg);
+    color: var(--text);
+    font: inherit;
+  }
+  .mk-select { display: flex; align-items: center; justify-content: space-between; }
+  .mk-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .mk-rule { height: 1px; background: var(--line); }
+  .mk-danger {
+    padding: 6px;
+    border: 1px solid var(--bad);
+    border-radius: var(--radius);
+    color: var(--bad);
+    background: transparent;
+    text-align: center;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .mk-diag {
+    display: flex; flex-direction: column; gap: 3px;
+    padding: 8px;
+    border-radius: var(--radius);
+    background: var(--diag-bg);
+    border-left: 3px solid var(--bad);
+  }
+  .mk-diag b { color: var(--bad); font-size: 11px; }
+  .mk-diag span { color: var(--dim); font-size: 10.5px; line-height: 1.4; }
+
+  /* =========== DIREÇÃO A — Console =========== */
+  .dir-a {
+    --ui: ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+    --bg: #0c1116;
+    --panel: #10161d;
+    --canvas: #080c10;
+    --line: #212c37;
+    --text: #dde5ec;
+    --dim: #7d8b99;
+    --accent: #35c2f0;
+    --on-accent: #04222e;
+    --ok: #47c66b;
+    --warn: #e0a02e;
+    --bad: #ef5f57;
+    --chip: #141c25;
+    --input-bg: #0a0f14;
+    --bar-bg: #10161dee;
+    --node-bg: #131b23;
+    --node-border: 1px solid #263544;
+    --node-shadow: 0 1px 0 rgb(255 255 255 / 4%) inset;
+    --sigla-bg: #1c2833;
+    --sigla-fg: #9fb2c4;
+    --badge-bg: #1c2833;
+    --badge-fg: #9fb2c4;
+    --btn-bg: transparent;
+    --btn-fg: #35c2f0;
+    --edge: #2c3d4d;
+    --track-bg: #1c2833;
+    --diag-bg: #1a1113;
+    --shadow: 0 6px 20px rgb(0 0 0 / 45%);
+    --radius: 4px;
+    --radius-sm: 3px;
+    --gap: 7px;
+    --pad-y: 6px;
+    --bar-pad: 9px 14px;
+    --node-pad: 8px 9px;
+    --node-gap: 5px;
+    --caps: uppercase;
+    --track: 0.1em;
+    --stat-size: 17px;
+    --stat-weight: 600;
+    --stat-gap: 22px;
+    --track-h: 3px;
+  }
+  .dir-a .mk-canvas {
+    background-image: radial-gradient(circle at 1px 1px, #17222c 1px, transparent 0);
+    background-size: 22px 22px;
+    background-position: 20px 74px;
+  }
+
+  /* =========== DIREÇÃO B — Prancheta =========== */
+  .dir-b {
+    --ui: ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace;
+    --bg: #eef1f4;
+    --panel: #ffffff;
+    --canvas: #f4f6f8;
+    --line: #ccd6df;
+    --text: #12242f;
+    --dim: #5d707c;
+    --accent: #12557f;
+    --on-accent: #ffffff;
+    --ok: #1d7a45;
+    --warn: #a56a06;
+    --bad: #b3261e;
+    --chip: #ffffff;
+    --input-bg: #ffffff;
+    --bar-bg: #ffffff;
+    --node-bg: #ffffff;
+    --node-border: 1px solid #12242f;
+    --node-shadow: none;
+    --sigla-bg: #12242f;
+    --sigla-fg: #ffffff;
+    --badge-bg: #e2e9ee;
+    --badge-fg: #12557f;
+    --btn-bg: #ffffff;
+    --btn-fg: #12557f;
+    --edge: #7e919e;
+    --track-bg: #dde4ea;
+    --diag-bg: #fbeceb;
+    --shadow: 0 1px 2px rgb(18 36 47 / 12%);
+    --radius: 2px;
+    --radius-sm: 2px;
+    --gap: 6px;
+    --pad-y: 6px;
+    --bar-pad: 8px 14px;
+    --node-pad: 7px 9px;
+    --node-gap: 5px;
+    --caps: uppercase;
+    --track: 0.09em;
+    --stat-size: 15px;
+    --stat-weight: 620;
+    --stat-gap: 18px;
+    --track-h: 2px;
+  }
+  .dir-b .mk-canvas {
+    background-image:
+      linear-gradient(to right, #dfe6ec 1px, transparent 1px),
+      linear-gradient(to bottom, #dfe6ec 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: 20px 74px;
+  }
+  .dir-b .mk-node { border-left-width: 4px; }
+
+  /* =========== DIREÇÃO C — Estúdio =========== */
+  .dir-c {
+    --ui: ui-rounded, "SF Pro Rounded", ui-sans-serif, system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace;
+    --bg: #f6f5fb;
+    --panel: #ffffff;
+    --canvas: #f1eff9;
+    --line: #e2dff0;
+    --text: #221d34;
+    --dim: #6f6889;
+    --accent: #5a49d6;
+    --on-accent: #ffffff;
+    --ok: #12886a;
+    --warn: #c07a10;
+    --bad: #d1435b;
+    --chip: #faf9fe;
+    --input-bg: #faf9fe;
+    --bar-bg: #ffffff;
+    --node-bg: #ffffff;
+    --node-border: 1px solid #e2dff0;
+    --node-shadow: 0 2px 10px rgb(34 29 52 / 9%);
+    --sigla-bg: #eeebfb;
+    --sigla-fg: #5a49d6;
+    --badge-bg: #eeebfb;
+    --badge-fg: #5a49d6;
+    --btn-bg: #ffffff;
+    --btn-fg: #5a49d6;
+    --edge: #b9b2d8;
+    --track-bg: #ebe8f6;
+    --diag-bg: #fdeef1;
+    --shadow: 0 6px 24px rgb(34 29 52 / 10%);
+    --radius: 11px;
+    --radius-sm: 7px;
+    --gap: 9px;
+    --pad-y: 8px;
+    --bar-pad: 11px 16px;
+    --node-pad: 10px 11px;
+    --node-gap: 6px;
+    --caps: none;
+    --track: 0.01em;
+    --stat-size: 18px;
+    --stat-weight: 640;
+    --stat-gap: 20px;
+    --track-h: 6px;
+  }
+  .dir-c .mk-node-name { font-size: 12.5px; }
+  .dir-c .mk-metrics { font-size: 10px; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .mk-edges .flow { stroke-dasharray: 3 7; animation: dash 1.4s linear infinite; }
+    @keyframes dash { to { stroke-dashoffset: -20; } }
+  }
+</style>
+
+<div class="wrap">
+  <header class="page-head">
+    <span class="kicker">System Design Simulator</span>
+    <h1>Três direções para a reforma visual</h1>
+    <p>
+      Cada bloco abaixo é a mesma tela — paleta, barra de controle, canvas com sete
+      componentes e painel de propriedades — desenhada em uma linguagem visual diferente.
+      A simulação mostrada é a mesma nos três: 12.000 RPS, a API degradada em 72% e o
+      Postgres sobrecarregado, para dar de ver como cada paleta se comporta sob estresse.
+      Escolha uma direção; os detalhes finos vêm depois.
+    </p>
+  </header>
+
+  <section class="dir">
+    <div class="dir-head">
+      <h2><span>Direção A —</span> Console</h2>
+      <p>
+        O simulador como painel de observabilidade. Fundo quase preto, números em
+        monoespaçada, cores de saúde saturadas contra o escuro. Denso e sério: quem
+        olha entende que veio para ler medições.
+      </p>
+    </div>
+    <ul class="tokens">
+      <li><i style="background:#0c1116"></i>#0C1116 fundo</li>
+      <li><i style="background:#131b23"></i>#131B23 nó</li>
+      <li><i style="background:#35c2f0"></i>#35C2F0 acento</li>
+      <li><i style="background:#47c66b"></i>#47C66B ok</li>
+      <li><i style="background:#e0a02e"></i>#E0A02E atenção</li>
+      <li><i style="background:#ef5f57"></i>#EF5F57 crítico</li>
+    </ul>
+    <div class="frame"><div class="mk dir-a" data-dir="a"></div></div>
+    <ul class="notes">
+      <li><b>Ponto forte:</b> as cores de saúde brilham; o olho vai direto ao componente em sofrimento.</li>
+      <li><b>Custo:</b> o React Flow precisa de tema escuro próprio, e a prosa longa da avaliação por IA pede cuidado de contraste.</li>
+      <li><b>Risco:</b> escuro demais pode cansar em sessão longa de leitura de texto.</li>
+    </ul>
+  </section>
+
+  <section class="dir">
+    <div class="dir-head">
+      <h2><span>Direção B —</span> Prancheta</h2>
+      <p>
+        Herança de desenho técnico: grade milimetrada, cantos retos, traço fino,
+        azul de nanquim. O nó é um bloco de diagrama com faixa de severidade na
+        borda esquerda. Quem olha entende que veio para desenhar uma arquitetura.
+      </p>
+    </div>
+    <ul class="tokens">
+      <li><i style="background:#f4f6f8"></i>#F4F6F8 canvas</li>
+      <li><i style="background:#12242f"></i>#12242F traço</li>
+      <li><i style="background:#12557f"></i>#12557F acento</li>
+      <li><i style="background:#1d7a45"></i>#1D7A45 ok</li>
+      <li><i style="background:#a56a06"></i>#A56A06 atenção</li>
+      <li><i style="background:#b3261e"></i>#B3261E crítico</li>
+    </ul>
+    <div class="frame"><div class="mk dir-b" data-dir="b"></div></div>
+    <ul class="notes">
+      <li><b>Ponto forte:</b> menor risco de implementação — o React Flow já nasce claro e o texto denso lê bem.</li>
+      <li><b>Custo:</b> as cores de saúde precisam ser escuras para contrastar no claro, então "gritam" menos que na direção A.</li>
+      <li><b>Risco:</b> a estética técnica pode ficar árida para quem está aprendendo.</li>
+    </ul>
+  </section>
+
+  <section class="dir">
+    <div class="dir-head">
+      <h2><span>Direção C —</span> Estúdio</h2>
+      <p>
+        Ferramenta de aprendizado, não console de produção. Cantos generosos,
+        sombras suaves, tipografia maior, barras de utilização gordas e legíveis,
+        acento violeta. Convida a mexer em vez de intimidar.
+      </p>
+    </div>
+    <ul class="tokens">
+      <li><i style="background:#f1eff9"></i>#F1EFF9 canvas</li>
+      <li><i style="background:#221d34"></i>#221D34 texto</li>
+      <li><i style="background:#5a49d6"></i>#5A49D6 acento</li>
+      <li><i style="background:#12886a"></i>#12886A ok</li>
+      <li><i style="background:#c07a10"></i>#C07A10 atenção</li>
+      <li><i style="background:#d1435b"></i>#D1435B crítico</li>
+    </ul>
+    <div class="frame"><div class="mk dir-c" data-dir="c"></div></div>
+    <ul class="notes">
+      <li><b>Ponto forte:</b> a barra de utilização vira o dado principal do nó — é ela que ensina saturação.</li>
+      <li><b>Custo:</b> menos densidade: cabem menos números na mesma área, e o canvas fica mais "macio" para um app de medição.</li>
+      <li><b>Risco:</b> arredondado + violeta é a estética mais datável das três.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+  const PALETTE = [
+    ["CLI", "Cliente"], ["CDN", "CDN"], ["LB", "Balanceador"], ["GW", "API Gateway"],
+    ["SVC", "Service"], ["CH", "Cache"], ["SQL", "Banco SQL"], ["NSQ", "Banco NoSQL"],
+    ["MQ", "Fila"], ["WRK", "Worker"], ["S3", "Object Storage"],
+  ];
+
+  const NODES = [
+    { sigla: "CLI", name: "Cliente", x: 8,   y: 150, util: 0,  rps: "12.000", lat: "0",   err: "0,0",  state: "ok" },
+    { sigla: "LB",  name: "Balanceador", x: 152, y: 150, util: 24, rps: "12.000", lat: "2", err: "0,0", state: "ok", tech: "NGINX" },
+    { sigla: "SVC", name: "API",     x: 296, y: 150, util: 72, rps: "11.800", lat: "96",  err: "1,6",  state: "warn", badge: "x4", tech: "Spring Boot" },
+    { sigla: "CH",  name: "Cache",   x: 440, y: 30,  util: 31, rps: "7.400",  lat: "1",   err: "0,0",  state: "ok", tech: "Redis" },
+    { sigla: "MQ",  name: "Fila",    x: 440, y: 270, util: 18, rps: "2.400",  lat: "5",   err: "0,0",  state: "ok", tech: "Kafka" },
+    { sigla: "WRK", name: "Worker",  x: 584, y: 270, util: 58, rps: "2.400",  lat: "42",  err: "0,0",  state: "ok", badge: "x2" },
+    { sigla: "SQL", name: "Postgres", x: 650, y: 150, util: 96, rps: "2.900", lat: "340", err: "12,4", state: "bad", badge: "2/3", tech: "PostgreSQL" },
+  ];
+
+  const EDGES = [
+    { d: "M140,198 L152,198" },
+    { d: "M284,198 L296,198" },
+    { d: "M428,198 C 434,198 434,78 440,78" },
+    { d: "M428,198 L650,198", hot: true },
+    { d: "M428,198 C 434,198 434,318 440,318" },
+    { d: "M572,318 L584,318" },
+    { d: "M650,270 C 650,250 716,252 716,246", hot: true },
+  ];
+
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  function nodeBody(dir, n) {
+    const color = `var(--${n.state})`;
+    const head = `
+      <div class="mk-node-head">
+        <span class="mk-sigla" ${dir === "a" ? `style="color:${color}"` : ""}>${esc(n.sigla)}</span>
+        <span class="mk-node-name">${esc(n.name)}</span>
+        ${n.badge ? `<span class="mk-badge">${esc(n.badge)}</span>` : ""}
+      </div>`;
+
+    if (dir === "a") {
+      return head + `
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <b style="font-family:var(--mono);font-size:16px;font-weight:620;color:${color};font-variant-numeric:tabular-nums">${n.util}%</b>
+          <span class="mk-label" style="letter-spacing:.1em">util</span>
+        </div>
+        <div class="mk-bar-track"><div class="mk-bar-fill" style="width:${n.util}%;background:${color}"></div></div>
+        <div class="mk-metrics" style="grid-template-columns:1fr">
+          <span>${esc(n.rps)} rps · ${esc(n.lat)} ms · ${esc(n.err)}%</span>
+        </div>`;
+    }
+
+    if (dir === "b") {
+      return head + `
+        <div class="mk-metrics">
+          <span>Util ${n.util}%</span><span>RPS ${esc(n.rps)}</span>
+          <span>Lat ${esc(n.lat)}ms</span><span>Err ${esc(n.err)}%</span>
+        </div>
+        <div class="mk-spacer"></div>
+        <div class="mk-bar-track"><div class="mk-bar-fill" style="width:${n.util}%;background:${color}"></div></div>`;
+    }
+
+    return head + `
+      ${n.tech ? `<span class="mk-tech">${esc(n.tech)}</span>` : `<span class="mk-tech">&nbsp;</span>`}
+      <div class="mk-bar-track"><div class="mk-bar-fill" style="width:${n.util}%;background:${color}"></div></div>
+      <div class="mk-metrics" style="grid-template-columns:1fr;color:${color}">
+        <span><b>${n.util}%</b> <span style="color:var(--dim)">· ${esc(n.lat)} ms · ${esc(n.err)}% erro</span></span>
+      </div>`;
+  }
+
+  function stage(dir) {
+    const edges = EDGES.map((e) => `<path class="${e.hot ? "hot flow" : "flow"}" d="${e.d}"></path>`).join("");
+    const nodes = NODES.map((n) => {
+      const color = `var(--${n.state})`;
+      const style = dir === "b"
+        ? `left:${n.x}px;top:${n.y}px;border-left-color:${color}`
+        : dir === "a"
+          ? `left:${n.x}px;top:${n.y}px;border-color:${n.state === "ok" ? "var(--line)" : color}`
+          : `left:${n.x}px;top:${n.y}px;box-shadow:0 2px 10px rgb(34 29 52 / 9%)${n.state === "ok" ? "" : `, 0 0 0 1.5px ${color}`}`;
+      return `<div class="mk-node" style="${style}">${nodeBody(dir, n)}</div>`;
+    }).join("");
+    return `<div class="mk-stage"><svg class="mk-edges" viewBox="0 0 800 385">${edges}</svg>${nodes}</div>`;
+  }
+
+  function render(el) {
+    const dir = el.dataset.dir;
+    el.innerHTML = `
+      <aside class="mk-side">
+        <p class="mk-title">Componentes</p>
+        <div class="mk-palette">
+          ${PALETTE.map(([s, n]) => `<div class="mk-pal-item"><span class="mk-sigla">${s}</span>${esc(n)}</div>`).join("")}
+        </div>
+        <div class="mk-spacer"></div>
+        <button class="mk-btn" type="button">Salvar e carregar</button>
+        <button class="mk-btn" type="button">Configurar API</button>
+      </aside>
+
+      <main class="mk-main">
+        <div class="mk-bar">
+          <button class="mk-btn mk-btn-primary" type="button">Parar</button>
+          <div class="mk-field">
+            <span class="mk-label">Carga</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="mk-slider"></div>
+              <span class="mk-input">12000</span>
+            </div>
+          </div>
+          <div class="mk-field">
+            <span class="mk-label">Escritas</span>
+            <span class="mk-input">20%</span>
+          </div>
+          <div class="mk-stats">
+            <div class="mk-stat"><span class="mk-label">Sucesso</span><b style="color:var(--warn)">87,6%</b></div>
+            <div class="mk-stat"><span class="mk-label">Latência</span><b>412 ms</b></div>
+            <div class="mk-stat"><span class="mk-label">Total</span><b>12.000</b></div>
+          </div>
+        </div>
+        <div class="mk-canvas">${stage(dir)}</div>
+      </main>
+
+      <aside class="mk-panel">
+        <p class="mk-title">Propriedades</p>
+        <div class="mk-prop">
+          <span class="mk-label">Nome</span>
+          <span class="mk-input" style="font-family:var(--ui)">Postgres</span>
+        </div>
+        <div class="mk-prop">
+          <span class="mk-label">Tecnologia</span>
+          <span class="mk-input mk-select" style="font-family:var(--ui)">PostgreSQL <span style="color:var(--dim)">▾</span></span>
+        </div>
+        <div class="mk-grid2">
+          <div class="mk-prop"><span class="mk-label">Capacidade</span><span class="mk-input">1500</span></div>
+          <div class="mk-prop"><span class="mk-label">Latência</span><span class="mk-input">8</span></div>
+          <div class="mk-prop"><span class="mk-label">Réplicas</span><span class="mk-input">3</span></div>
+          <div class="mk-prop"><span class="mk-label">Erro (%)</span><span class="mk-input">0</span></div>
+        </div>
+        <div class="mk-diag">
+          <b>Escrita saturada</b>
+          <span>A primária responde por 100% das escritas. Réplicas não aliviam escrita.</span>
+        </div>
+        <button class="mk-danger" type="button">Excluir componente</button>
+        <div class="mk-rule"></div>
+        <p class="mk-title">Avaliação por IA</p>
+        <div class="mk-prop">
+          <span class="mk-label">Desafio</span>
+          <span class="mk-input mk-select" style="font-family:var(--ui)">URL shortener <span style="color:var(--dim)">▾</span></span>
+        </div>
+        <button class="mk-btn mk-btn-primary" type="button">Avaliar design</button>
+      </aside>`;
+  }
+
+  document.querySelectorAll(".mk").forEach(render);
+</script>

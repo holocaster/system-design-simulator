@@ -1,0 +1,13 @@
+# Simulador de System Design
+
+> Simulador visual e gratuito de arquiteturas de sistemas distribuídos, 100% no navegador. Monte componentes (client, CDN, load balancer, API gateway, service, cache, filas, workers, SQL, NoSQL, storage) por drag-and-drop, gere carga real e observe latência, erros, saúde e escalabilidade ao vivo. Ferramenta educacional para quem estuda ou ensina system design.
+
+## Key pages
+
+- [Simulador](https://example.com/): Aplicação completa — monte um design, ajuste RPS e mix de leitura/escrita, rode a simulação e avalie a arquitetura por IA (via OpenRouter).
+- [O que é System Design](https://example.com/system-design/): Guia introdutório — requisitos, escalabilidade, disponibilidade, latência e os componentes comuns de uma arquitetura distribuída.
+- [Cache em System Design](https://example.com/componentes/cache/): Quando usar cache, cache-aside, TTL, invalidação e como o cache é modelado na simulação.
+
+## Technical files
+
+- [Sitemap](https://example.com/sitemap.xml): Lista de URLs indexadas.
